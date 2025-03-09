@@ -21,13 +21,16 @@ public class MoviesController(IMovieRepository movieRepository) : ControllerBase
         var response = movie.MapToResponse();
         // When new item is created in a REST API, Return a Created/201 response
         // This Should include the proper contract response and location URI
-        return CreatedAtAction(nameof(Get), new { id = response.Id }, response);
+        return CreatedAtAction(nameof(Get), new { idOrSlug = response.Id }, response);
     }
 
     [HttpGet(ApiEndpoints.Movies.Get)]
-    public async Task<IActionResult> Get([FromRoute] Guid id)
+    public async Task<IActionResult> Get([FromRoute] string idOrSlug)
     {
-        var movie = await _movieRepository.GetByIdAsync(id);
+        var movie = Guid.TryParse(idOrSlug, out var id)
+            ? await _movieRepository.GetByIdAsync(id)
+            : await _movieRepository.GetBySlugAsync(idOrSlug);
+
         if (movie == null) return NotFound();
         return Ok(movie.MapToResponse());
     }
