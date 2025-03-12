@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies.Application", "Movie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies.Contracts", "Movies.Contracts\Movies.Contracts.csproj", "{2654C120-8A85-40B5-A59A-4E9501CE07CF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{70277B56-9758-4DCF-9BA7-9802E7D8FDA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Api", "Identity.Api\Identity.Api.csproj", "{F0FBAE7A-F657-4F2A-9AF5-C4311271DED5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,11 +30,18 @@ Global
 		{2654C120-8A85-40B5-A59A-4E9501CE07CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2654C120-8A85-40B5-A59A-4E9501CE07CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2654C120-8A85-40B5-A59A-4E9501CE07CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0FBAE7A-F657-4F2A-9AF5-C4311271DED5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0FBAE7A-F657-4F2A-9AF5-C4311271DED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0FBAE7A-F657-4F2A-9AF5-C4311271DED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0FBAE7A-F657-4F2A-9AF5-C4311271DED5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3606C279-A90D-4403-8B9C-A92CEB1EE01F}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F0FBAE7A-F657-4F2A-9AF5-C4311271DED5} = {70277B56-9758-4DCF-9BA7-9802E7D8FDA6}
 	EndGlobalSection
 EndGlobal
