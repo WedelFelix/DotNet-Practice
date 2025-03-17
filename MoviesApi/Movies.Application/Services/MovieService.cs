@@ -7,7 +7,8 @@ namespace Movies.Application.Services;
 public class MovieService(
     IMovieRepository movieRepository,
     IValidator<Movie> movieValidator,
-    IRatingRepository ratingRepository) : IMovieService
+    IRatingRepository ratingRepository,
+    IValidator<GetAllMoviesOptions> optionsValidator) : IMovieService
 {
     public async Task<bool> CreateAsync(Movie movie, CancellationToken cancellationToken = default)
     {
@@ -55,8 +56,16 @@ public class MovieService(
         return movieRepository.ExistsByIdAsync(id, cancellationToken);
     }
 
-    public Task<IEnumerable<Movie>> GetAllAsync(Guid? userId = null, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Movie>> GetAllAsync(GetAllMoviesOptions options,
+        CancellationToken cancellationToken = default)
     {
-        return movieRepository.GetAllAsync(userId, cancellationToken);
+        await optionsValidator.ValidateAsync(options, cancellationToken);
+
+        return await movieRepository.GetAllAsync(options, cancellationToken);
+    }
+
+    public Task<int> GetCountAsync(GetAllMoviesOptions options, CancellationToken cancellationToken = default)
+    {
+        return movieRepository.GetCountAsync(options, cancellationToken);
     }
 }
