@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Movies.Api.Auth;
 using Movies.Api.Mapping;
 using Movies.Application.Services;
@@ -11,7 +12,7 @@ namespace Movies.Api.Controllers.V1;
 
 [ApiController]
 [ApiVersion("1.0")]
-public class MoviesController(IMovieService movieService) : ControllerBase
+public class MoviesController(IMovieService movieService, IOutputCacheStore outputCacheStore) : ControllerBase
 {
     private readonly IMovieService _movieService = movieService;
 
@@ -24,7 +25,8 @@ public class MoviesController(IMovieService movieService) : ControllerBase
 
         // We should always be creating and passing down cancellation tokens from our controllers
         // This helps us save on resources when a request is cancelled
-        var result = await _movieService.CreateAsync(movie, cancellationToken);
+        await _movieService.CreateAsync(movie, cancellationToken);
+        await outputCacheStore.EvictByTagAsync("movies", cancellationToken);
         // ALWAYS return contracts, not domain models
         var response = movie.MapToResponse();
         // When new item is created in a REST API, Return a Created/201 response
@@ -33,6 +35,8 @@ public class MoviesController(IMovieService movieService) : ControllerBase
     }
 
     [HttpGet(ApiEndpoints.Movies.Get)]
+    [ResponseCache(Duration = 30, VaryByHeader = "Accept, Accept-Encoding", Location = ResponseCacheLocation.Any)]
+    [OutputCache(PolicyName = "Movies")]
     public async Task<IActionResult> Get([FromRoute] string idOrSlug,
         [FromServices] LinkGenerator linkGenerator,
         CancellationToken cancellationToken)
@@ -79,6 +83,9 @@ public class MoviesController(IMovieService movieService) : ControllerBase
     }
 
     [HttpGet(ApiEndpoints.Movies.GetAll)]
+    [OutputCache(PolicyName = "MovieCache")]
+    [ResponseCache(Duration = 30, VaryByQueryKeys = ["title", "year", "sortBy", "page", "pageSize"],
+        VaryByHeader = "Accept, Accept-Encoding", Location = ResponseCacheLocation.Any)]
     public async Task<IActionResult> GetAll([FromQuery] GetAllMoviesRequest request,
         CancellationToken cancellationToken)
     {
@@ -100,6 +107,8 @@ public class MoviesController(IMovieService movieService) : ControllerBase
         var updatedMovie = await _movieService.UpdateAsync(movie, userId, cancellationToken);
 
         if (updatedMovie is null) return NotFound();
+
+        await outputCacheStore.EvictByTagAsync("movies", cancellationToken);
         var response = movie.MapToResponse();
         return Ok(response);
     }
@@ -110,6 +119,7 @@ public class MoviesController(IMovieService movieService) : ControllerBase
     {
         var isDeleted = await _movieService.DeleteByIdAsync(id, cancellationToken);
         if (!isDeleted) return NotFound();
+        await outputCacheStore.EvictByTagAsync("movies", cancellationToken);
         return NoContent();
     }
 }
