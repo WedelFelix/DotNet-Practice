@@ -94,7 +94,10 @@ public class MoviesController(IMovieService movieService, IOutputCacheStore outp
         var options = request.MapToOptions().WithUser(userId);
         var movies = await _movieService.GetAllAsync(options, cancellationToken);
         var movieCount = await _movieService.GetCountAsync(options, cancellationToken);
-        return Ok(movies.MapToResponse(request.Page, request.PageSize, movieCount));
+        return Ok(movies.MapToResponse(
+            request.Page.GetValueOrDefault(PagedRequest.DefaultPage),
+            request.PageSize.GetValueOrDefault(PagedRequest.DefaultPageSize),
+            movieCount));
     }
 
     [Authorize(AuthConstants.TrustedMemberPolicyName)]
